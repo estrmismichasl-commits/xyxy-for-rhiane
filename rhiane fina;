@@ -1,0 +1,343 @@
+
+import webbrowser
+from pathlib import Path
+
+HTML = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Little Note for You</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Quicksand', sans-serif;
+    background: linear-gradient(135deg, #ffd1e3, #ff8fb8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    overflow-x: hidden;
+    color: #8a2a55;
+    padding: 20px;
+}
+
+#hearts {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.heart {
+    position: absolute;
+    bottom: -40px;
+    color: white;
+    animation: floatUp linear infinite;
+}
+
+@keyframes floatUp {
+    to {
+        transform: translateY(-110vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+.container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 450px;
+}
+
+h1, h2 {
+    font-family: 'Pacifico', cursive;
+}
+
+h1 {
+    color: white;
+    font-size: clamp(30px, 8vw, 42px);
+}
+
+.subtitle {
+    color: white;
+    font-weight: bold;
+}
+
+.envelope {
+    background: #fff8fb;
+    border: none;
+    border-radius: 20px;
+    padding: 30px 60px;
+    font-size: 65px;
+    cursor: pointer;
+    box-shadow: 0 10px 25px #ff5c9a66;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.letter {
+    display: none;
+    background: #fff8fb;
+    border: 3px dashed #ff8fb8;
+    border-radius: 25px;
+    padding: 25px;
+    text-align: left;
+    box-shadow: 0 15px 35px #d63d7b55;
+    animation: appear .6s ease;
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+        transform: scale(.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.letter h2 {
+    color: #ff5c9a;
+}
+
+.letter p {
+    line-height: 1.7;
+    font-size: 15px;
+}
+
+.signature {
+    font-family: 'Pacifico', cursive;
+    text-align: right;
+    color: #ff5c9a;
+}
+
+.question {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    border: none;
+    border-radius: 30px;
+    padding: 13px 25px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.yes {
+    background: #ff5c9a;
+    color: white;
+}
+
+.no {
+    background: white;
+    color: #ff5c9a;
+    border: 2px solid #ff8fb8;
+}
+
+#thanks {
+    display: none;
+    color: #ff5c9a;
+    font-family: 'Pacifico', cursive;
+    text-align: center;
+    font-size: 23px;
+    margin-top: 20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="hearts"></div>
+
+<div class="container">
+
+    <h1 id="title">Hi riyannn gwapaaa!!</h1>
+    <p class="subtitle" id="subtitle">Tap the envelope</p>
+
+    <button class="envelope" id="envelope">💌</button>
+
+    <p class="subtitle" id="hint">It's just for you ♡</p>
+
+    <section class="letter" id="letter">
+
+        <h2>Hi rhianieee!!! 🤍</h2>
+
+        <p>
+        Oummmm, I just wanna tell you how much I love you
+        and how thankful I am na niabot ka sa akong life.
+        Wala jud ko nag expect na mahimong ingani ka ka
+        special sa akoa, but I'm really glad na ikaw
+        akong nakaila.
+        </p>
+
+        <p>
+        I really enjoy spending time with you, bisag mag
+        talk lang ta about random things or mag binuang
+        ta sa usag usa HAHAHAHA. I appreciate all the
+        little things about you, and I'm happy nga naa
+        ka sa akong life. You make things feel lighter
+        without even trying, and I hope you know that.
+        </p>
+
+        <p>
+        I just want you to know na I appreciate you
+        for who you are, and I'm happy nga we're getting
+        to know each other more.
+        </p>
+
+        <p class="signature">
+        I love youuu, rhianieee!! 🤍 HAHAHAHAHA
+        </p>
+
+        <div class="question">
+
+            <strong>Crush na gyud ko nimo ani?</strong>
+
+            <div class="buttons" id="buttons">
+                <button class="btn yes" id="yes">
+                    Yes! 💖
+                </button>
+
+                <button class="btn no" id="no">
+                    Not yet
+                </button>
+            </div>
+
+            <div id="thanks">
+                Yown! Labyah beb! 🤍
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+<script>
+
+const hearts = document.getElementById("hearts");
+
+function createHearts(amount) {
+    for (let i = 0; i < amount; i++) {
+        const heart = document.createElement("span");
+
+        heart.className = "heart";
+        heart.textContent = ["♡", "♥", "❤"][
+            Math.floor(Math.random() * 3)
+        ];
+
+        heart.style.left = Math.random() * 100 + "%";
+        heart.style.fontSize = (15 + Math.random() * 30) + "px";
+        heart.style.animationDuration = (7 + Math.random() * 8) + "s";
+        heart.style.animationDelay = (-Math.random() * 10) + "s";
+
+        hearts.appendChild(heart);
+    }
+}
+
+createHearts(25);
+
+const envelope = document.getElementById("envelope");
+const letter = document.getElementById("letter");
+
+envelope.addEventListener("click", () => {
+
+    envelope.style.display = "none";
+
+    document.getElementById("subtitle").style.display = "none";
+    document.getElementById("hint").style.display = "none";
+
+    document.getElementById("title").textContent =
+        "For you, rhianieee 🤍";
+
+    letter.style.display = "block";
+
+    letter.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
+
+});
+
+let scale = 1;
+
+document.getElementById("no").addEventListener("click", function() {
+
+    scale = Math.max(0.5, scale - 0.12);
+
+    this.style.transform = `scale(${scale})`;
+
+    const yes = document.getElementById("yes");
+
+    yes.style.transform = `scale(${1 + (1-scale)})`;
+
+    const messages = [
+        "Really? 🥺",
+        "Not even a little?",
+        "Pretty please?"
+    ];
+
+    this.textContent =
+        messages[Math.floor(Math.random() * messages.length)];
+
+});
+
+document.getElementById("yes").addEventListener("click", () => {
+
+    document.getElementById("thanks").style.display = "block";
+
+    document.getElementById("buttons").style.display = "none";
+
+    document.getElementById("title").textContent = "Yay! 🤍";
+
+    createHearts(40);
+
+});
+
+</script>
+
+</body>
+</html>
+"""
+
+
+def main():
+    folder = Path(__file__).resolve().parent
+    website = folder / "confession.html"
+
+    website.write_text(HTML, encoding="utf-8")
+
+    print("Confession website created successfully!")
+    print(f"Website location: {website}")
+
+    webbrowser.open(website.as_uri())
+
+
+if __name__ == "__main__":
+    main()
